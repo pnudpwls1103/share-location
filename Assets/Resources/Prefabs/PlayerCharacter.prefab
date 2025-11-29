@@ -16,6 +16,9 @@ GameObject:
   - component: {fileID: 8996008271832108315}
   - component: {fileID: 3436049744644956828}
   - component: {fileID: 1442415062179481992}
+  - component: {fileID: 3988649111952613152}
+  - component: {fileID: 84533781258076624}
+  - component: {fileID: 5021407350673456681}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -161,6 +164,9 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 3436049744644956828}
   - {fileID: 1442415062179481992}
+  - {fileID: 3988649111952613152}
+  - {fileID: 84533781258076624}
+  - {fileID: 5021407350673456681}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3436049744644956828
 MonoBehaviour:
@@ -194,3 +200,44 @@ MonoBehaviour:
   PlayerSpeed: 2
   JumpForce: 5
   GravityValue: -9.81
+--- !u!114 &3988649111952613152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8997698344618777863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe7e86687c868914a8cf25c048268b11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerColor
+  MeshRenderer: {fileID: 6075296112836725250}
+  _NetworkedColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &84533781258076624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8997698344618777863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e33b81c55f0c53e4d9185a56bae5b08e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  _NetworkedHealth: 100
+--- !u!114 &5021407350673456681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8997698344618777863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9ff59b4b94b7d4fadc54997d7920fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaycastAttack
+  Damage: 10
+  PlayerMovement: {fileID: 1442415062179481992}

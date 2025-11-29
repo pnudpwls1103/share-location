@@ -9,6 +9,7 @@ public class PlayerMovement : NetworkBehaviour
 
     private CharacterController _controller;
     private Vector3 _velocity;
+    private Camera _camera;
 
     private bool _jumpPressed;
 
@@ -25,6 +26,15 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    public override void Spawned()
+    {
+        if (HasStateAuthority)
+        {
+            _camera = Camera.main;
+            _camera.GetComponent<FirstPersonCamera>().SetTarget(transform);
+        }
+    }
+
     public override void FixedUpdateNetwork()
     {
         if (HasStateAuthority == false)
@@ -37,7 +47,8 @@ public class PlayerMovement : NetworkBehaviour
             _velocity = new Vector3(0, -1, 0);
         }
 
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Quaternion cameraRotationY = Quaternion.Euler(0, _camera.transform.rotation.eulerAngles.y, 0);
+        Vector3 move = cameraRotationY * new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         _velocity.y += GravityValue * Runner.DeltaTime;
         if (_jumpPressed && _controller.isGrounded)
         {

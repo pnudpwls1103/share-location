@@ -118,6 +118,156 @@ public class FirstPersonCamera : MonoBehaviour
 
 ---
 
+### Shared Mode Basics - 네트워크 속성
+**링크**: [https://doc.photonengine.com/ko-kr/fusion/current/tutorials/shared-mode-basics/4-network-properties](https://doc.photonengine.com/ko-kr/fusion/current/tutorials/shared-mode-basics/4-network-properties)  
+**날짜**: 2024-12-19  
+**카테고리**: 네트워크 속성, 데이터 동기화, StateAuthority  
+**핵심 내용**:
+- **네트워크 속성 기본 개념**:
+  - `NetworkTransform`은 위치만 동기화, 다른 변수는 `[Networked]` 속성 필요
+  - `[Networked]` 속성: `StateAuthority`에서 다른 모든 클라이언트로 상태 동기화
+  - 네트워크 속성은 **속성(property)**이어야 함 - 일반 필드는 지원 안 됨 (`{get; set;}` 필수)
+- **StateAuthority 규칙**:
+  - `StateAuthority`가 없는 객체의 네트워크 속성 변경 시 로컬 예측으로만 적용되고 재정의될 수 있음
+  - 모든 클라이언트에 동기화하려면 **반드시 `StateAuthority`에서만 업데이트**
+- **변경 감지 및 렌더링**:
+  - `OnChangedRender` 속성: 각 렌더 프레임(Unity Update)에서 변경 감지
+  - 네트워크 속성 변경 시 자동으로 콜백 함수 호출
+  - 예제: 플레이어 색상 변경 시 모든 클라이언트에 반영
+
+**참고 코드/예제**:
+```csharp
+using Fusion;
+using UnityEngine;
+
+public class PlayerColor : NetworkBehaviour
+{
+    public MeshRenderer MeshRenderer;
+    
+    [Networked, OnChangedRender(nameof(ColorChanged))]
+    public Color NetworkedColor { get; set; }
+    
+    void Update()
+    {
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+        {
+            // StateAuthority에서만 변경해야 모든 클라이언트에 동기화됨
+            NetworkedColor = new Color(
+                Random.Range(0f, 1f), 
+                Random.Range(0f, 1f), 
+                Random.Range(0f, 1f), 
+                1f
+            );
+        }
+    }
+    
+    void ColorChanged()
+    {
+        // 네트워크 속성 변경 시 자동 호출됨
+        MeshRenderer.material.color = NetworkedColor;
+    }
+}
+```
+
+**추가 메모**:
+- 네트워크 속성은 반드시 `{get; set;}` 형태의 property여야 함
+- `StateAuthority`가 아닌 클라이언트에서 변경하면 로컬 예측으로만 적용되고 나중에 덮어씌워질 수 있음
+- `OnChangedRender`는 Unity Update 주기에서 변경 감지 (렌더링 프레임)
+- 직접 Material 색상을 변경하면 안 됨 - 네트워크 속성을 변경하고 콜백에서 렌더링 업데이트
+
+---
+
+### Shared Mode Basics - 원격 프로시저 호출 (RPC)
+**링크**: [https://doc.photonengine.com/ko-kr/fusion/current/tutorials/shared-mode-basics/5-remote-procedure-calls](https://doc.photonengine.com/ko-kr/fusion/current/tutorials/shared-mode-basics/5-remote-procedure-calls)  
+**날짜**: 2024-12-19  
+**카테고리**: RPC, 원격 호출, 네트워크 상호작용  
+**핵심 내용**:
+- **RPC 기본 개념**:
+  - 다른 플레이어의 네트워크 속성을 수정하려면 RPC 사용 필요
+  - `StateAuthority`가 없는 객체는 직접 네트워크 속성 변경 불가
+  - RPC는 특정 클라이언트에서 함수를 실행하도록 요청하는 메커니즘
+- **RPC 소스와 타겟 설정**:
+  - `RpcSources`: RPC를 호출할 수 있는 클라이언트 지정
+    - `All`: 누구나 호출 가능 (기본값은 `InputAuthority`만 가능)
+    - `InputAuthority`: 객체를 제어하는 클라이언트만 호출 가능
+  - `RpcTargets`: RPC를 수신할 클라이언트 지정
+    - `StateAuthority`: 상태 권한을 가진 클라이언트에서만 실행
+    - `All`: 모든 클라이언트에서 실행
+- **RPC 실행 위치**:
+  - RPC 내부 코드는 `RpcTarget` 클라이언트에서 실행됨
+  - `RpcTargets.StateAuthority`로 설정하면 StateAuthority에서만 실행되어 네트워크 속성 수정 가능
+- **사용 사례**:
+  - 다른 플레이어에게 피해 입히기 (가장 일반적)
+  - 플레이어 간 메시지, 이모티콘 등 휘발성 상호작용
+  - 게임 시작, 준비 상태 등 게임 플로우 제어
+
+**참고 코드/예제**:
+```csharp
+// Health 컴포넌트 - 네트워크 속성과 RPC
+using Fusion;
+using UnityEngine;
+
+public class Health : NetworkBehaviour
+{
+    [Networked, OnChangedRender(nameof(HealthChanged))]
+    public float NetworkedHealth { get; set; } = 100;
+    
+    void HealthChanged()
+    {
+        Debug.Log($"Health changed to: {NetworkedHealth}");
+    }
+    
+    // RPC: 모든 클라이언트에서 호출 가능, StateAuthority에서만 실행
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void DealDamageRpc(float damage)
+    {
+        // 이 코드는 StateAuthority 클라이언트에서만 실행됨
+        // 따라서 네트워크 속성을 안전하게 수정할 수 있음
+        NetworkedHealth -= damage;
+    }
+}
+
+// RaycastAttack - 레이캐스트로 공격
+public class RaycastAttack : NetworkBehaviour
+{
+    public float Damage = 10;
+    public PlayerMovement PlayerMovement;
+    
+    void Update()
+    {
+        if (HasStateAuthority == false) return;
+        
+        Ray ray = PlayerMovement.Camera.ScreenPointToRay(Input.mousePosition);
+        ray.origin += PlayerMovement.Camera.transform.forward;
+        
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            Debug.DrawRay(ray.origin, ray.direction, Color.red, 1f);
+            
+            // Physics Raycast로 타겟 찾기
+            if (Runner.GetPhysicsScene().Raycast(ray.origin, ray.direction, out var hit))
+            {
+                if (hit.transform.TryGetComponent<Health>(out var health))
+                {
+                    // RPC 호출로 다른 플레이어에게 피해 입히기
+                    health.DealDamageRpc(Damage);
+                }
+            }
+        }
+    }
+}
+```
+
+**추가 메모**:
+- RPC는 `[Rpc]` 속성으로 표시된 메서드
+- 기본적으로 `InputAuthority`만 RPC 호출 가능, `RpcSources.All`로 모든 클라이언트에서 호출 가능하게 설정
+- `RpcTargets.StateAuthority`는 네트워크 속성을 수정해야 할 때 필수
+- RPC 내부 코드는 타겟 클라이언트에서 실행되므로 StateAuthority의 네트워크 속성을 안전하게 수정 가능
+- 대부분의 경우 네트워크 속성과 변경 감지기만으로도 충분하지만, 다른 플레이어의 상태를 수정할 때는 RPC 필요
+- `Runner.GetPhysicsScene().Raycast()` 사용: Fusion의 물리 시뮬레이션과 동기화된 레이캐스트
+
+---
+
 ## 템플릿
 
 새로운 링크를 추가할 때 아래 템플릿을 사용하세요:
