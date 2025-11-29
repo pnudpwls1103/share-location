@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 3988649111952613152}
   - component: {fileID: 84533781258076624}
   - component: {fileID: 5021407350673456681}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4248c244021ab14a8409096c427bd18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  PlayerSpeed: 2
+  PlayerSpeed: 1
   JumpForce: 5
   GravityValue: -9.81
 --- !u!114 &3988649111952613152

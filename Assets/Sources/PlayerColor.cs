@@ -9,10 +9,16 @@ public class PlayerColor : NetworkBehaviour
 
     void Update()
     {
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+        if (HasInputAuthority && Input.GetKeyDown(KeyCode.E))
         {
-            NetworkedColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+            ChangeColorRpc();
         }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void ChangeColorRpc()
+    {
+        NetworkedColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
     }
 
     void ColorChanged()

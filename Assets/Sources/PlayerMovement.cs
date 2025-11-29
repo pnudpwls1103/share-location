@@ -28,16 +28,25 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (HasStateAuthority)
+        // Input Authority를 가진 플레이어만 카메라 할당
+        if (HasInputAuthority)
         {
             _camera = Camera.main;
-            _camera.GetComponent<FirstPersonCamera>().SetTarget(transform);
+            if (_camera != null)
+            {
+                var cameraController = _camera.GetComponent<FirstPersonCamera>();
+                if (cameraController != null)
+                {
+                    cameraController.SetTarget(transform);
+                }
+            }
         }
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (HasStateAuthority == false)
+        // Input Authority를 가진 플레이어만 입력 처리
+        if (HasInputAuthority == false)
         {
             return;
         }
