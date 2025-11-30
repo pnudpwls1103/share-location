@@ -1,3 +1,30 @@
 {
-    "dotnet.preferCSharpExtension": true
+    "omnisharp.useModernNet": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Library": true,
+        "**/Temp": true,
+        "**/obj": true,
+        "**/Build": true,
+        "**/Logs": true
+    },
+    "search.exclude": {
+        "**/Library": true,
+        "**/Temp": true,
+        "**/obj": true,
+        "**/Build": true,
+        "**/Logs": true
+    },
+    "files.watcherExclude": {
+        "**/Library/**": true,
+        "**/Temp/**": true,
+        "**/obj/**": true,
+        "**/Build/**": true,
+        "**/Logs/**": true
+    },
+    "dotnet.formatting.organizeImportsOnFormat": true,
+    "dotnet.defaultSolution": "share-location.sln"
 }
