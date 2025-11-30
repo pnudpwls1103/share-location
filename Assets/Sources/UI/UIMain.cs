@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class UIMain : MonoBehaviour
 {
@@ -43,7 +43,11 @@ public class UIMain : MonoBehaviour
     /// </summary>
     private void OnGPSUpdated(float latitude, float longitude)
     {
-        UpdateGPSDisplay(latitude, longitude);
+        if (textGPS)
+        {
+            Vector3 coordinate = BSCoordinate.LatLonToWorld(latitude, longitude, 100);
+            textGPS.text = $"GPS: {coordinate.x:F6}, {coordinate.y:F6}, {coordinate.z:F6}";
+        }
     }
 
     /// <summary>
@@ -52,17 +56,6 @@ public class UIMain : MonoBehaviour
     private void OnGPSFailed(string errorMessage)
     {
         ShowErrorMessage(errorMessage);
-    }
-
-    /// <summary>
-    /// GPS 값 UI에 표시
-    /// </summary>
-    private void UpdateGPSDisplay(float latitude, float longitude)
-    {
-        if (textGPS)
-        {
-            textGPS.text = $"GPS: {latitude:F6}, {longitude:F6}";
-        }
     }
 
     public void SetRoomCode(string roomCode)
