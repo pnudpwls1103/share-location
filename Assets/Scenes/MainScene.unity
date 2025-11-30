@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UILobby
       objectReference: {fileID: 0}
+    - target: {fileID: 1527301078086639891, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2929506635671342432, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -410,19 +414,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.60485065
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.000000021855694
+      value: -0.000000013219431
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.796339
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.000000017404542
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 254.436
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 1cc11ffbe578fa547b800e780e45b9c1, type: 3}
       propertyPath: m_CastShadows
@@ -1065,6 +1073,7 @@ GameObject:
   - component: {fileID: 1201495084}
   - component: {fileID: 1201495085}
   - component: {fileID: 1201495086}
+  - component: {fileID: 1201495087}
   m_Layer: 0
   m_Name: MainScene
   m_TagString: Untagged
@@ -1117,6 +1126,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8109dd7da283c4a4399d68753b54e9a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GPSController
+--- !u!114 &1201495087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201495082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2bdf9af6718a2341b0f941085b839f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PinSpawner
+  gpsController: {fileID: 1201495086}
+  networkRunner: {fileID: 1222975595}
+  pinPrefab: {fileID: 3992468765635102211, guid: d874ef7d1b92e95479065cdfd400a5eb, type: 3}
+  pinParent: {fileID: 338893678}
+  earthRadius: 100
 --- !u!1 &1222975593
 GameObject:
   m_ObjectHideFlags: 0

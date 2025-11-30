@@ -1,9 +1,9 @@
-using Fusion;
-using Fusion.Sockets;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Fusion;
+using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -235,6 +235,9 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
             // 방 접속 시 GPS 초기화
             StartGPS();
 
+            // 핀 스포너 초기화
+            InitializePinSpawner();
+
             // 호스트인 경우 (방 생성자) OnRoomCreated 이벤트 호출
             if (runner.IsServer && !string.IsNullOrEmpty(currentRoomCode))
             {
@@ -261,6 +264,22 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
         else
         {
             Debug.LogWarning("GPSController not found!");
+        }
+    }
+
+    /// <summary>
+    /// 핀 스포너 초기화
+    /// </summary>
+    private void InitializePinSpawner()
+    {
+        PinSpawner pinSpawner = FindFirstObjectByType<PinSpawner>();
+        if (pinSpawner != null)
+        {
+            pinSpawner.ResetPinSpawn();
+        }
+        else
+        {
+            Debug.LogWarning("PinSpawner not found! Pin will not be spawned.");
         }
     }
 
