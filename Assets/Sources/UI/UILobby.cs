@@ -7,39 +7,42 @@ public class UILobby : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private RoomManager roomManager;
+    [SerializeField] private UIMain uiMain;
 
     [Header("UI Elements")]
     [SerializeField] private Button btnCreateRoom;
     [SerializeField] private Button btnJoinRoom;
     [SerializeField] private TMP_InputField inputRoomCode;
-    [SerializeField] private TextMeshProUGUI textRoomCode;
-    [SerializeField] private TextMeshProUGUI textErrorMessage;
     [SerializeField] private GameObject panelLobby;
-    [SerializeField] private GameObject panelWaiting;
 
     private bool isConnecting = false;
 
     private void Awake()
     {
-        if (roomManager == null)
+        if (!roomManager)
         {
             roomManager = FindFirstObjectByType<RoomManager>();
         }
 
-        if (roomManager == null)
+        if (!roomManager)
         {
             Debug.LogError("RoomManager not found!");
             return;
         }
 
-        if (panelLobby == null)
+        if (!uiMain)
         {
-            panelLobby = this.gameObject;
+            uiMain = FindFirstObjectByType<UIMain>();
         }
 
-        if (textErrorMessage == null)
+        if (!uiMain)
         {
-            textErrorMessage = this.transform.Find("Text_Error")?.GetComponent<TextMeshProUGUI>();
+            Debug.LogWarning("UIMain not found!");
+        }
+
+        if (!panelLobby)
+        {
+            panelLobby = this.gameObject;
         }
 
         // 이벤트 구독
@@ -52,7 +55,7 @@ public class UILobby : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (roomManager != null)
+        if (roomManager)
         {
             // 이벤트 구독 해제
             roomManager.OnRoomCreated -= OnRoomCreated;
@@ -66,26 +69,22 @@ public class UILobby : MonoBehaviour
     private void Start()
     {
         // 버튼 이벤트 연결
-        if (btnCreateRoom != null)
+        if (btnCreateRoom)
         {
             btnCreateRoom.onClick.AddListener(OnCreateRoomClicked);
         }
 
-        if (btnJoinRoom != null)
+        if (btnJoinRoom)
         {
             btnJoinRoom.onClick.AddListener(OnJoinRoomClicked);
         }
 
         // 초기 UI 상태 설정
-        ClearErrorMessage();
-        if (textRoomCode != null)
+        if (uiMain)
         {
-            textRoomCode.text = "";
-        }
-
-        if (panelWaiting != null)
-        {
-            panelWaiting.SetActive(false);
+            uiMain.ClearErrorMessage();
+            uiMain.SetRoomCode("");
+            uiMain.SetWaitingPanelActive(false);
         }
     }
 
@@ -104,7 +103,7 @@ public class UILobby : MonoBehaviour
 
         try
         {
-            if (roomManager != null)
+            if (roomManager)
             {
                 await roomManager.CreateRoom();
             }
@@ -135,7 +134,7 @@ public class UILobby : MonoBehaviour
         }
 
         // 방 코드 입력 확인
-        string roomCode = inputRoomCode != null ? inputRoomCode.text.Trim().ToUpper() : "";
+        string roomCode = inputRoomCode ? inputRoomCode.text.Trim().ToUpper() : "";
         if (string.IsNullOrEmpty(roomCode))
         {
             ShowErrorMessage("Please enter a room code.");
@@ -151,10 +150,13 @@ public class UILobby : MonoBehaviour
         SetConnectingState(true);
         try
         {
-            if (roomManager != null)
+            if (roomManager)
             {
                 await roomManager.JoinRoom(roomCode);
-                inputRoomCode.gameObject.SetActive(false);
+                if (inputRoomCode)
+                {
+                    inputRoomCode.gameObject.SetActive(false);
+                }
             }
         }
         catch (System.Exception e)
@@ -172,9 +174,9 @@ public class UILobby : MonoBehaviour
     {
         Debug.Log($"Room created: {roomCode}");
 
-        if (textRoomCode != null)
+        if (uiMain)
         {
-            textRoomCode.text = $"RoomId: {roomCode}";
+            uiMain.SetRoomCode(roomCode);
         }
 
         SetConnectingState(false);
@@ -190,7 +192,7 @@ public class UILobby : MonoBehaviour
         SetConnectingState(false);
 
         // 로비 UI 숨기기 (게임 씬으로 전환될 예정)
-        if (panelLobby != null)
+        if (panelLobby)
         {
             panelLobby.SetActive(false);
         }
@@ -228,10 +230,9 @@ public class UILobby : MonoBehaviour
     /// </summary>
     private void ShowErrorMessage(string message)
     {
-        if (textErrorMessage != null)
+        if (uiMain)
         {
-            textErrorMessage.text = message;
-            textErrorMessage.gameObject.SetActive(true);
+            uiMain.ShowErrorMessage(message);
         }
     }
 
@@ -240,10 +241,9 @@ public class UILobby : MonoBehaviour
     /// </summary>
     private void ClearErrorMessage()
     {
-        if (textErrorMessage != null)
+        if (uiMain)
         {
-            textErrorMessage.text = "";
-            textErrorMessage.gameObject.SetActive(false);
+            uiMain.ClearErrorMessage();
         }
     }
 
@@ -254,24 +254,24 @@ public class UILobby : MonoBehaviour
     {
         isConnecting = connecting;
 
-        if (btnCreateRoom != null)
+        if (btnCreateRoom)
         {
             btnCreateRoom.interactable = !connecting;
         }
 
-        if (btnJoinRoom != null)
+        if (btnJoinRoom)
         {
             btnJoinRoom.interactable = !connecting;
         }
 
-        if (inputRoomCode != null)
+        if (inputRoomCode)
         {
             inputRoomCode.interactable = !connecting;
         }
 
-        if (panelWaiting != null)
+        if (uiMain)
         {
-            panelWaiting.SetActive(connecting);
+            uiMain.SetWaitingPanelActive(connecting);
         }
     }
 }

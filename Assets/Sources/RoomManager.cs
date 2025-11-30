@@ -232,6 +232,9 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             Debug.Log("Player joined room");
 
+            // 방 접속 시 GPS 초기화
+            StartGPS();
+
             // 호스트인 경우 (방 생성자) OnRoomCreated 이벤트 호출
             if (runner.IsServer && !string.IsNullOrEmpty(currentRoomCode))
             {
@@ -242,6 +245,22 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
                 // 클라이언트인 경우 (방 참가자) OnRoomJoined 이벤트 호출
                 OnRoomJoined?.Invoke();
             }
+        }
+    }
+
+    /// <summary>
+    /// GPS 초기화 시작
+    /// </summary>
+    private void StartGPS()
+    {
+        GPSController gpsController = FindFirstObjectByType<GPSController>();
+        if (gpsController != null)
+        {
+            StartCoroutine(gpsController.InitGPS());
+        }
+        else
+        {
+            Debug.LogWarning("GPSController not found!");
         }
     }
 
