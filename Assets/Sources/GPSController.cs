@@ -9,20 +9,18 @@ public class GPSController : MonoBehaviour
 {
     private readonly int MAX_WAIT = 20;
 
-    // GPS 값 저장
     private float latitude;
     private float longitude;
     private bool isGPSReady = false;
 
-    // 이벤트: GPS 값 읽은 후 호출
     public event Action<float, float> OnGPSUpdated; // latitude, longitude
-    // 이벤트: GPS 실패 시 호출
     public event Action<string> OnGPSFailed; // error message
 
-    // Getter 함수들
+    #region Getter
     public float GetLatitude() => latitude;
     public float GetLongitude() => longitude;
     public bool IsGPSReady() => isGPSReady;
+    #endregion
 
     public IEnumerator InitGPS()
     {
