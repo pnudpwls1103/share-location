@@ -61,14 +61,12 @@ public class GPSController : MonoBehaviour
             yield break;
         }
 
-        // GPS 값 읽기 및 저장
         latitude = Input.location.lastData.latitude;
         longitude = Input.location.lastData.longitude;
         isGPSReady = true;
 
         Debug.Log($"GPS Ready. Lat: {latitude}, Lon: {longitude}");
-
-        // 이벤트 호출
         OnGPSUpdated?.Invoke(latitude, longitude);
+        Input.location.Stop();
     }
 }
