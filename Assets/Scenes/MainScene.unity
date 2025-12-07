@@ -131,42 +131,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: UILobby
       objectReference: {fileID: 0}
-    - target: {fileID: 1527301078086639891, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929506635671342432, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929506635671342432, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929506635671342432, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2929506635671342432, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2991319128255443236, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2991319128255443236, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2991319128255443236, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2991319128255443236, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7605103786718818852, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
       propertyPath: uiMain
       value: 
@@ -175,14 +139,6 @@ PrefabInstance:
       propertyPath: roomManager
       value: 
       objectReference: {fileID: 1201495085}
-    - target: {fileID: 7605103786718818852, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: textRoomCode
-      value: 
-      objectReference: {fileID: 1271101049}
-    - target: {fileID: 7605103786718818852, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: textErrorMessage
-      value: 
-      objectReference: {fileID: 481063083}
     - target: {fileID: 8307410260741783873, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -261,22 +217,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8307410260741783873, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8837244172193304059, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8837244172193304059, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8837244172193304059, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8837244172193304059, guid: 3a9687f9e3de2e34b9c5782553a17e4c, type: 3}
-      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1139,7 +1079,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PinSpawner
   gpsController: {fileID: 1201495086}
-  networkRunner: {fileID: 1222975595}
   pinPrefab: {fileID: 3992468765635102211, guid: d874ef7d1b92e95479065cdfd400a5eb, type: 3}
   pinParent: {fileID: 338893678}
   earthRadius: 100

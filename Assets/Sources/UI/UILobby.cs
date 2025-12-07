@@ -1,7 +1,8 @@
+using System.Threading.Tasks;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System.Threading.Tasks;
 
 public class UILobby : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class UILobby : MonoBehaviour
     [SerializeField] private GameObject panelLobby;
 
     private bool isConnecting = false;
+    private RectTransform inputRoomCodeRect;
+    private Vector2 inputRoomCodeOriginalPosition;
+    private bool isInputAnimating = false;
 
     private void Awake()
     {
@@ -79,6 +83,16 @@ public class UILobby : MonoBehaviour
             btnJoinRoom.onClick.AddListener(OnJoinRoomClicked);
         }
 
+        // inputRoomCode RectTransform 및 초기 위치 저장
+        if (inputRoomCode)
+        {
+            inputRoomCodeRect = inputRoomCode.GetComponent<RectTransform>();
+            if (inputRoomCodeRect)
+            {
+                inputRoomCodeOriginalPosition = inputRoomCodeRect.anchoredPosition;
+            }
+        }
+
         // 초기 UI 상태 설정
         if (uiMain)
         {
@@ -93,20 +107,18 @@ public class UILobby : MonoBehaviour
     /// </summary>
     private async void OnCreateRoomClicked()
     {
-        if (isConnecting)
-        {
-            return;
-        }
+        if (isConnecting) return;
+
+        btnCreateRoom?.transform
+            .DOPunchScale(Vector3.one * 0.3f, 0.3f, 10, 1f)
+            .SetEase(Ease.OutQuad);
 
         ClearErrorMessage();
         SetConnectingState(true);
 
         try
         {
-            if (roomManager)
-            {
-                await roomManager.CreateRoom();
-            }
+            await roomManager?.CreateRoom();
         }
         catch (System.Exception e)
         {
@@ -121,15 +133,12 @@ public class UILobby : MonoBehaviour
     /// </summary>
     private async void OnJoinRoomClicked()
     {
-        if (isConnecting)
-        {
-            return;
-        }
-        ClearErrorMessage();
+        if (isConnecting) return;
 
+        ClearErrorMessage();
         if (!inputRoomCode.gameObject.activeSelf)
         {
-            inputRoomCode.gameObject.SetActive(true);
+            ShowInputWithAnimation();
             return;
         }
 
@@ -146,6 +155,10 @@ public class UILobby : MonoBehaviour
             ShowErrorMessage("Room code must be 6 characters.");
             return;
         }
+
+        btnJoinRoom?.transform
+            .DOPunchScale(Vector3.one * 0.3f, 0.3f, 10, 1f)
+            .SetEase(Ease.OutQuad);
 
         SetConnectingState(true);
         try
@@ -236,15 +249,32 @@ public class UILobby : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 에러 메시지 지우기
-    /// </summary>
     private void ClearErrorMessage()
     {
         if (uiMain)
         {
             uiMain.ClearErrorMessage();
         }
+    }
+
+    private void ShowInputWithAnimation()
+    {
+        if (!inputRoomCode || !inputRoomCodeRect || isInputAnimating)
+            return;
+
+        isInputAnimating = true;
+        Vector2 startPosition = inputRoomCodeOriginalPosition;
+        startPosition.y -= 50f;
+
+        inputRoomCodeRect.anchoredPosition = startPosition;
+        inputRoomCode.gameObject.SetActive(true);
+        inputRoomCodeRect
+            .DOAnchorPosY(inputRoomCodeOriginalPosition.y, 0.5f)
+            .SetEase(Ease.OutCubic)
+            .OnComplete(() =>
+            {
+                isInputAnimating = false;
+            });
     }
 
     /// <summary>
