@@ -1,11 +1,10 @@
 using Fusion;
 using UnityEngine;
 
-public class PinSpawner : MonoBehaviour
+public class PinSpawner : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] private GPSController gpsController;
-    [SerializeField] private NetworkRunner networkRunner;
 
     [Header("Pin Settings")]
     [SerializeField] private GameObject pinPrefab;
@@ -19,11 +18,6 @@ public class PinSpawner : MonoBehaviour
         if (!gpsController)
         {
             gpsController = FindFirstObjectByType<GPSController>();
-        }
-
-        if (!networkRunner)
-        {
-            networkRunner = FindFirstObjectByType<NetworkRunner>();
         }
     }
 
@@ -59,30 +53,51 @@ public class PinSpawner : MonoBehaviour
             return;
         }
 
+        // 네트워크 오브젝트인지 확인
+        NetworkObject networkPinPrefab = pinPrefab.GetComponent<NetworkObject>();
+        if (networkPinPrefab != null && Runner != null && Runner.IsRunning)
+        {
+            // 네트워크 오브젝트로 스폰 - RPC를 통해 서버에 요청
+            RequestSpawnPinRpc(latitude, longitude);
+            // RPC 호출 후 로컬에서도 플래그 설정 (중복 호출 방지)
+            hasSpawnedPin = true;
+        }
+        else
+        {
+            // 일반 오브젝트로 생성 (네트워크가 없을 때)
+            Vector3 worldPosition = BSCoordinate.LatLonToWorld(latitude, longitude, earthRadius);
+            Vector3 direction = (worldPosition - pinParent.position).normalized;
+            Quaternion rotation = Quaternion.FromToRotation(Vector3.up, direction);
+            GameObject pinInstance = Instantiate(pinPrefab, worldPosition, rotation);
+            Debug.Log($"Pin spawned (local) at GPS: {latitude:F6}, {longitude:F6} -> World: {worldPosition}");
+            hasSpawnedPin = true;
+        }
+    }
+
+    /// <summary>
+    /// 서버에 핀 스폰 요청 (RPC)
+    /// </summary>
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RequestSpawnPinRpc(float latitude, float longitude, RpcInfo info = default)
+    {
+        if (pinPrefab == null)
+        {
+            Debug.LogWarning("Pin prefab is not assigned!");
+            return;
+        }
+
         // GPS 좌표를 Unity 월드 좌표로 변환
-        // 핀의 회전을 구 표면에 수직으로 설정
         Vector3 worldPosition = BSCoordinate.LatLonToWorld(latitude, longitude, earthRadius);
         Vector3 direction = (worldPosition - pinParent.position).normalized;
         // Capsule의 Y축(up)이 표면 법선 방향과 일치하도록 회전 설정
         Quaternion rotation = Quaternion.FromToRotation(Vector3.up, direction);
-        // 네트워크 오브젝트인지 확인
+
         NetworkObject networkPinPrefab = pinPrefab.GetComponent<NetworkObject>();
-        if (networkPinPrefab != null && networkRunner != null && networkRunner.IsRunning)
+        if (networkPinPrefab != null && Runner != null)
         {
-            // 네트워크 오브젝트로 스폰
-            if (networkRunner.IsServer)
-            {
-                networkRunner.Spawn(networkPinPrefab, worldPosition, rotation);
-                Debug.Log($"Pin spawned at GPS: {latitude:F6}, {longitude:F6} -> World: {worldPosition}");
-                hasSpawnedPin = true;
-            }
-        }
-        else
-        {
-            // 일반 오브젝트로 생성
-            GameObject pinInstance = Instantiate(pinPrefab, worldPosition, rotation);
-            Debug.Log($"Pin spawned at GPS: {latitude:F6}, {longitude:F6} -> World: {worldPosition}");
-            hasSpawnedPin = true;
+            // 서버에서 네트워크 오브젝트로 스폰 (모든 클라이언트에 동기화됨)
+            Runner.Spawn(networkPinPrefab, worldPosition, rotation, info.Source);
+            Debug.Log($"Pin spawned (network) for player {info.Source} at GPS: {latitude:F6}, {longitude:F6} -> World: {worldPosition}");
         }
     }
 
