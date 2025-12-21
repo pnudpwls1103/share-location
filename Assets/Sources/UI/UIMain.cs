@@ -5,6 +5,7 @@ public class UIMain : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GPSController gpsController;
+    [SerializeField] private RoomManager roomManager;
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI textRoomCode;
@@ -17,6 +18,11 @@ public class UIMain : MonoBehaviour
         if (!gpsController)
         {
             gpsController = FindFirstObjectByType<GPSController>();
+        }
+
+        if (!roomManager)
+        {
+            roomManager = FindFirstObjectByType<RoomManager>();
         }
     }
 
@@ -90,6 +96,18 @@ public class UIMain : MonoBehaviour
         {
             panelWaiting.SetActive(active);
         }
+    }
+
+    public void OnSceneLoadButtonClicked()
+    {
+        if (roomManager == null)
+        {
+            Debug.LogError("RoomManager is not assigned. Cannot load scene.");
+            ShowErrorMessage("RoomManager를 찾을 수 없습니다.");
+            return;
+        }
+
+        roomManager.LoadGameScene();
     }
 }
 

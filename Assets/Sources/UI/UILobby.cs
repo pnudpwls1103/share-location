@@ -262,19 +262,20 @@ public class UILobby : MonoBehaviour
         if (!inputRoomCode || !inputRoomCodeRect || isInputAnimating)
             return;
 
-        isInputAnimating = true;
-        Vector2 startPosition = inputRoomCodeOriginalPosition;
-        startPosition.y -= 50f;
-
-        inputRoomCodeRect.anchoredPosition = startPosition;
         inputRoomCode.gameObject.SetActive(true);
-        inputRoomCodeRect
-            .DOAnchorPosY(inputRoomCodeOriginalPosition.y, 0.5f)
-            .SetEase(Ease.OutCubic)
-            .OnComplete(() =>
-            {
-                isInputAnimating = false;
-            });
+        // isInputAnimating = true;
+        // Vector2 startPosition = inputRoomCodeOriginalPosition;
+        // startPosition.y -= 50f;
+
+        // inputRoomCodeRect.anchoredPosition = startPosition;
+        // inputRoomCode.gameObject.SetActive(true);
+        // inputRoomCodeRect
+        //     .DOAnchorPosY(inputRoomCodeOriginalPosition.y, 0.5f)
+        //     .SetEase(Ease.OutCubic)
+        //     .OnComplete(() =>
+        //     {
+        //         isInputAnimating = false;
+        //     });
     }
 
     /// <summary>

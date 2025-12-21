@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
@@ -89,19 +90,19 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
         DontDestroyOnLoad(runner);
 
         // SceneManager와 ObjectProvider 설정
-        var sceneManager = runner.GetComponent<INetworkSceneManager>();
-        if (sceneManager == null)
-        {
-            sceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
-        }
+        // var sceneManager = runner.GetComponent<INetworkSceneManager>();
+        // if (sceneManager == null)
+        // {
+        //     sceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
+        // }
 
-        var objectProvider = runner.GetComponent<INetworkObjectProvider>();
-        if (objectProvider == null)
-        {
-            objectProvider = runner.gameObject.AddComponent<NetworkObjectProviderDefault>();
-        }
+        // var objectProvider = runner.GetComponent<INetworkObjectProvider>();
+        // if (objectProvider == null)
+        // {
+        //     objectProvider = runner.gameObject.AddComponent<NetworkObjectProviderDefault>();
+        // }
 
-        // 콜백 등록
+        // // 콜백 등록
         runner.AddCallbacks(this);
     }
 
@@ -126,11 +127,12 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
 
         var startGameArgs = new StartGameArgs
         {
-            GameMode = GameMode.AutoHostOrClient, // Host 모드로 방 생성
-            SessionName = currentRoomCode,
+            GameMode = GameMode.Shared,
+            // SessionName = currentRoomCode,
             Scene = sceneInfo,
             SceneManager = sceneManager,
             ObjectProvider = objectProvider,
+            PlayerCount = 2,
         };
 
         await runner.StartGame(startGameArgs);
@@ -163,7 +165,7 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
 
         var startGameArgs = new StartGameArgs
         {
-            GameMode = GameMode.AutoHostOrClient, // Client 모드로 방 참가
+            GameMode = GameMode.Shared,
             SessionName = currentRoomCode,
             Scene = sceneInfo,
             SceneManager = sceneManager,
@@ -185,8 +187,7 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // INetworkRunnerCallbacks 구현
-
-    public void OnConnectedToServer(NetworkRunner runner)
+    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("Connected to server");
         OnConnectedToServerAction?.Invoke();
@@ -209,7 +210,7 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
         Debug.Log($"Disconnected from server: {reason}");
         OnDisconnected?.Invoke(reason.ToString());
@@ -232,14 +233,11 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             Debug.Log("Player joined room");
 
-            // 방 접속 시 GPS 초기화
             StartGPS();
-
-            // 핀 스포너 초기화
             InitializePinSpawner();
 
             // 호스트인 경우 (방 생성자) OnRoomCreated 이벤트 호출
-            if (runner.IsServer && !string.IsNullOrEmpty(currentRoomCode))
+            if (runner.IsSharedModeMasterClient && !string.IsNullOrEmpty(currentRoomCode))
             {
                 OnRoomCreated?.Invoke(currentRoomCode);
             }
@@ -385,6 +383,38 @@ public class RoomManager : MonoBehaviour, INetworkRunnerCallbacks
     public string GetCurrentRoomCode()
     {
         return currentRoomCode;
+    }
+
+    /// <summary>
+    /// GameScene (씬 번호 1번)으로 이동
+    /// 호스트만 호출하면 다른 플레이어들도 자동으로 따라감
+    /// </summary>
+    public void LoadGameScene()
+    {
+        if (runner == null || !runner.IsRunning || runner.ActivePlayers.Count() != 2)
+        {
+            Debug.LogError("NetworkRunner is not running or player count is not 2. Cannot load scene.");
+            return;
+        }
+
+        if (!runner.IsSharedModeMasterClient)
+        {
+            Debug.LogWarning("Only the host can load scenes. This call will be ignored.");
+            return;
+        }
+
+        // 씬 번호 1번으로 이동
+        SceneRef gameSceneRef = SceneRef.FromIndex(1);
+
+        if (!gameSceneRef.IsValid)
+        {
+            Debug.LogError("GameScene (index 1) is not valid. Please check Build Settings.");
+            return;
+        }
+
+        // NetworkRunner를 통해 씬 로드 (호스트가 호출하면 모든 플레이어가 따라감)
+        runner.LoadScene(gameSceneRef, LoadSceneMode.Single);
+        Debug.Log("Loading GameScene (index 1)...");
     }
 }
 
